@@ -873,6 +873,7 @@
         leader: 0
     };
     let userAnswers = []; // Store user answers for deterministic results
+    let isAnswering = false; // Block double-clicks during transition
 
     // Initialize Telegram WebApp
     let tg = window.Telegram.WebApp;
@@ -893,6 +894,7 @@
             leader: 0
         };
         userAnswers = [];
+        isAnswering = false;
         showQuestion();
     }
 
@@ -920,6 +922,9 @@
     }
 
     function selectAnswer(answer, answerIndex, cardElement) {
+        if (isAnswering) return;
+        isAnswering = true;
+
         // Remove previous selection
         document.querySelectorAll('.answer-card').forEach(card => {
             card.classList.remove('selected');
@@ -937,6 +942,7 @@
         // Next question after delay
         setTimeout(() => {
             currentQuestion++;
+            isAnswering = false;
             if (currentQuestion < questions.length) {
                 showQuestion();
             } else {
@@ -979,15 +985,16 @@
     function shareResult() {
         const characterName = document.getElementById('characterName').textContent;
         const shareText = `Я прошёл тест "Кто ты из аниме?" и получил ${characterName}! 🍥✨ Пройди и ты!`;
+        const shareUrl = 'https://t.me/taiyakicafe';
 
-        if (tg.initDataUnsafe.user) {
-            tg.shareMessage(shareText);
-        } else {
-            // Fallback for web version
+        try {
+            tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`);
+        } catch (e) {
             if (navigator.share) {
                 navigator.share({
                     title: 'Кто ты из аниме?',
-                    text: shareText
+                    text: shareText,
+                    url: shareUrl
                 });
             } else {
                 alert('Сделай скриншот и поделись с друзьями!');
