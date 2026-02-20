@@ -585,8 +585,8 @@
         {
             question: "Какое японское блюдо ты выберешь?",
             answers: [
-                { text: "Рамен с насыщенным бульоном", emoji: "🍜", archetype: "hero" },
-                { text: "Набе (горячий горшочек)", emoji: "🍲", archetype: "strategist" },
+                { text: "Вкуснейший рамен", emoji: "🍜", archetype: "hero" },
+                { text: "Набэ", emoji: "🍲", archetype: "strategist" },
                 { text: "Онигири с начинкой", emoji: "🍙", archetype: "optimist" },
                 { text: "Карри с говядиной", emoji: "🍛", archetype: "rebel" }
             ]
@@ -631,18 +631,18 @@
             question: "Как ты реагируешь на конфликт?",
             answers: [
                 { text: "Решаю проблему сразу и честно", emoji: "💪", archetype: "hero" },
-                { text: "Обдумываю стратегию", emoji: "🎯", archetype: "strategist" },
-                { text: "Пытаюсь сгладить углы", emoji: "🕊️", archetype: "optimist" },
-                { text: "Иду своим путём", emoji: "🚶", archetype: "rebel" }
+                { text: "Анализирую ситуацию и ищу решение", emoji: "🎯", archetype: "strategist" },
+                { text: "Стараюсь найти компромисс", emoji: "🕊️", archetype: "optimist" },
+                { text: "Отстаиваю свою позицию до конца", emoji: "🚶", archetype: "rebel" }
             ]
         },
         {
             question: "Что для тебя важнее всего?",
             answers: [
-                { text: "Защищать близких", emoji: "🛡️", archetype: "hero" },
-                { text: "Достигать целей", emoji: "🎯", archetype: "strategist" },
-                { text: "Свобода выбора", emoji: "🦅", archetype: "rebel" },
-                { text: "Находить красоту в мире", emoji: "🌸", archetype: "dreamer" }
+                { text: "Семья и близкие люди", emoji: "🛡️", archetype: "hero" },
+                { text: "Карьера и самореализация", emoji: "🎯", archetype: "strategist" },
+                { text: "Свобода и независимость", emoji: "🦅", archetype: "rebel" },
+                { text: "Творчество и самовыражение", emoji: "🌸", archetype: "dreamer" }
             ]
         }
     ];
@@ -984,7 +984,7 @@
     function shareResult() {
         const characterName = document.getElementById('characterName').textContent;
         const shareText = `Я прошёл тест "Кто ты из аниме?" и получил ${characterName}! 🍥✨ Пройди и ты!`;
-        const shareUrl = 'https://t.me/taiyakicafe';
+        const shareUrl = 'http://t.me/anime_quiz_taiyaki_bot/anime_test';
 
         try {
             tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`);
