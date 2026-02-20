@@ -637,7 +637,7 @@
             question: "Какой напиток ты выберешь?",
             answers: [
                 { text: "Маття-латте", emoji: "🍵", archetype: "introvert", image: "images/answers/matcha-latte.jpg" },
-                { text: "Японский лимонад", emoji: "🥤", archetype: "optimist", image: "images/answers/lemonade.png" },
+                { text: "Японский лимонад", emoji: "🥤", archetype: "optimist", image: "images/answers/lemonade.jpg" },
                 { text: "Юдзу чай", emoji: "🍊", archetype: "dreamer", image: "images/answers/yuzu-tea.jpg" },
                 { text: "Маття Момо Айс", emoji: "🧋", archetype: "leader", image: "images/answers/matcha-momo.jpg" }
             ]
@@ -693,7 +693,7 @@
                 name: "Sailor Moon",
                 anime: "Sailor Moon",
                 emoji: "🌙",
-                image: "images/characters/sailor-moon.png",
+                image: "images/characters/sailor-moon.jpg",
                 description: "Ты как Сейлор Мун - на защите любви и справедливости! В тебе живут искренность и эмоциональность, а когда дело касается близких, ты обретаешь невероятную силу. Доброта и вера в людей - твоя настоящая суперсила.",
                 food: "Тайяки и маття латте - сладкая сила для тех, кто защищает любовь и справедливость!"
             }
@@ -727,7 +727,7 @@
                 name: "Сатору Годжо",
                 anime: "Jujutsu Kaisen",
                 emoji: "😎",
-                image: "images/characters/gojo.png",
+                image: "images/characters/gojo.jpg",
                 description: "Ты сильнейший, и ты это знаешь. Как Годжо, ты уверен в себе, харизматичен и всегда контролируешь ситуацию. За твоей беспечностью скрывается острый ум.",
                 food: "Набе - для тех, кто знает себе цену."
             }
@@ -779,7 +779,7 @@
                 name: "Джотаро Куджо",
                 anime: "JoJo's Bizarre Adventure",
                 emoji: "⭐",
-                image: "images/characters/jotaro.png",
+                image: "images/characters/jotaro.jpg",
                 description: "Сильный, молчаливый и крутой. Ты не любишь лишних слов, но твои действия говорят сами за себя. Преданность и сила - твои козыри.",
                 food: "Рамен без лишних слов - сытно и по делу."
             },
@@ -805,7 +805,7 @@
                 name: "Луффи",
                 anime: "One Piece",
                 emoji: "🏴‍☠️",
-                image: "images/characters/luffy.png",
+                image: "images/characters/luffy.jpg",
                 description: "Ты воплощение позитива и авантюризма! Как Луффи, ты веришь в дружбу, любишь приключения и всегда идёшь вперёд с улыбкой. Твоя энергия заразительна!",
                 food: "Гюдон - сытное блюдо для настоящих искателей приключений!"
             },
@@ -873,7 +873,7 @@
                 name: "Цунаде",
                 anime: "Naruto",
                 emoji: "🍶",
-                image: "images/characters/tsunade.png",
+                image: "images/characters/tsunade.jpg",
                 description: "В тебе живёт дух прирождённого лидера с железной волей. Как Цунаде, ты сочетаешь мудрость и силу, защищая тех, кто тебе дорог. Ты Хокаге - глава деревни, и все знают, что с тобой лучше не связываться. За строгостью скрывается доброе сердце.",
                 food: "Набе - блюдо для командной трапезы и задушевных бесед."
             },
@@ -916,6 +916,32 @@
     };
     let userAnswers = []; // Store user answers for deterministic results
     let isAnswering = false; // Block double-clicks during transition
+    const imageCache = new Map(); // Preloaded images cache
+
+    // Preload images for a given question index
+    function preloadQuestionImages(questionIndex) {
+        if (questionIndex >= questions.length) return;
+        questions[questionIndex].answers.forEach(answer => {
+            if (answer.image && !imageCache.has(answer.image)) {
+                const img = new Image();
+                img.src = answer.image;
+                imageCache.set(answer.image, img);
+            }
+        });
+    }
+
+    // Preload all character images (called near end of quiz)
+    function preloadCharacterImages() {
+        Object.values(characters).forEach(list => {
+            list.forEach(ch => {
+                if (ch.image && !imageCache.has(ch.image)) {
+                    const img = new Image();
+                    img.src = ch.image;
+                    imageCache.set(ch.image, img);
+                }
+            });
+        });
+    }
 
     // Initialize Telegram WebApp
     let tg = window.Telegram.WebApp;
@@ -937,6 +963,8 @@
         };
         userAnswers = [];
         isAnswering = false;
+        preloadQuestionImages(0);
+        preloadQuestionImages(1);
         showQuestion();
     }
 
@@ -955,12 +983,20 @@
             const card = document.createElement('div');
             card.className = 'answer-card';
             card.innerHTML = `
-                    <div class="answer-image">${answer.image ? `<img src="${answer.image}" alt="${answer.text}" onerror="this.parentElement.textContent='${answer.emoji}'">` : answer.emoji}</div>
+                    <div class="answer-image">${answer.image ? `<img src="${answer.image}" alt="${answer.text}" decoding="async" onerror="this.parentElement.textContent='${answer.emoji}'">` : answer.emoji}</div>
                     <div class="answer-label">${answer.text}</div>
                 `;
             card.onclick = () => selectAnswer(answer, index, card);
             answersGrid.appendChild(card);
         });
+
+        // Preload next question images
+        preloadQuestionImages(currentQuestion + 1);
+
+        // Preload character images when quiz is almost done
+        if (currentQuestion >= questions.length - 2) {
+            preloadCharacterImages();
+        }
     }
 
     function selectAnswer(answer, answerIndex, cardElement) {
@@ -1019,7 +1055,7 @@
 
         const charImageEl = document.getElementById('characterImage');
         if (character.image) {
-            charImageEl.innerHTML = `<img src="${character.image}" alt="${character.name}" onerror="this.parentElement.textContent='${character.emoji}'">`;
+            charImageEl.innerHTML = `<img src="${character.image}" alt="${character.name}" decoding="async" onerror="this.parentElement.textContent='${character.emoji}'">`;
         } else {
             charImageEl.textContent = character.emoji;
         }
